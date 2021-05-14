@@ -327,8 +327,8 @@ void finalPermutation(int pos, int text)
 void convertToBinary(int n)
 {
   int k, m;
-  static int location = 63;
-  for (int i = 7; i >= 0; i--, location--)
+  static int location = 0;
+  for (int i = 7; i >= 0; i--, location++)
   {
     m = 1 << i;
     k = n & m;
@@ -348,9 +348,9 @@ int convertCharToBit(long int n)
   int i = n * 8;
   MESSAGEINBITS = malloc((i+1)*sizeof(char));
 
-  for(i-=1;i>=0;i--)
+  for(i = 0; i < n * 8; i++)
   {
-    ch = MESSAGE[i];
+    ch = MESSAGE[i]; //CAMINHOS/0
     convertToBinary(ch);
   }
   printf("mensagem em bits: %s\n", MESSAGEINBITS);
@@ -388,6 +388,10 @@ void Encryption(long int plain[])
         }
         finalPermutation(i, CIPHER[i]);
     }
+    printf("encripted: ");
+    for(int i=0; i<64; i++)
+      printf("%d", ENCRYPTED[i]);
+    printf("\n");
 }
 
  
@@ -490,14 +494,14 @@ int* encrypt(long int n)
   long int plain[n * 64];
   char ch;
 
-  for(int i = 0; i < n*8; i++)
+  for(int i = 0; i < n*64; i++)
   {
       ch = MESSAGEINBITS[i];
       plain[i] = ch - 48;
       // printf("plain: %ld\n", plain[i]);
   }
-  for(int i=n*8; i<n*64; i++)
-    plain[i]=0;
+  // for(int i=n*8; i<n*64; i++)
+  //   plain[i]=0;
 
   // printf("antes do Encryption\n");
   for (int i = 0; i < n; i++) {
@@ -541,10 +545,29 @@ int main(int argc, char** argv)
 
   int* cipher = encrypt(n);
 
-  printf("cifra: ");
-  for(int i=0; i<64; i++)
-    printf("%d", cipher[i]);
-  printf("\n");
+
+  // long int binaryval = 0;
+  // for(int i=63; i>=0; i--){
+  //   binaryal += cipher[i]*pow(10, 63-i);  
+  // }
+  // printf("binaryval: %ld", binaryval);
+
+  // long int hexadecimalval = 0, remainder;
+  // while (binaryval != 0)
+  //   {
+  //       remainder = binaryval % 10;
+  //       hexadecimalval = hexadecimalval + remainder * i;
+  //       i = i * 2;
+  //       binaryval = binaryval / 10;
+  //   }
+  //   printf("Equivalent hexadecimal value: %lX", hexadecimalval);
+
+
+
+  // printf("cifra: ");
+  // for(int i=0; i<64; i++)
+  //   printf("%d", cipher[i]);
+  // printf("\n");
 
   return 0;
 }
