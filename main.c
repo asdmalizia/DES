@@ -164,6 +164,7 @@ void expansion_function(int pos, int text)
   {
     if (E[i] == pos + 1) {
         EXPtext[i] = text;
+        // printf("text: %d\n", text);
     }
   }
 }
@@ -178,6 +179,7 @@ void initialPermutation(int pos, int text)
     }
   }
   IPtext[i] = text;
+  // printf("text: %d\n", text);
 }
  
 int F1(int i)
@@ -190,7 +192,8 @@ int F1(int i)
  
     r = b[0] * 2 + b[5];
     c = 8 * b[1] + 4 * b[2] + 2 * b[3] + b[4];
- 
+    // printf("r: %d, c: %d\n", r, c);
+
     if (i == 0) {
         return S1[r][c];
     }
@@ -324,8 +327,8 @@ void finalPermutation(int pos, int text)
 void convertToBinary(int n)
 {
   int k, m;
-  static int location = 0;
-  for (int i = 7; i >= 0; i--, location++)
+  static int location = 63;
+  for (int i = 7; i >= 0; i--, location--)
   {
     m = 1 << i;
     k = n & m;
@@ -337,7 +340,6 @@ void convertToBinary(int n)
       MESSAGEINBITS[location] = '1';
     }
   }
-  // printf("Mensagem: %s\n", MESSAGEINBITS);
 }
  
 int convertCharToBit(long int n)
@@ -351,6 +353,7 @@ int convertCharToBit(long int n)
     ch = MESSAGE[i];
     convertToBinary(ch);
   }
+  printf("mensagem em bits: %s\n", MESSAGEINBITS);
 }
  
 void Encryption(long int plain[])
@@ -367,44 +370,26 @@ void Encryption(long int plain[])
         RIGHT[0][i - 32] = IPtext[i];
     }
  
-    // for (int k = 1; k < 17; k++)
-    // {
-    //     cipher(k, 0);
+    for (int k = 1; k < 17; k++)
+    {
+        cipher(k, 0);
  
-    //     for (int i = 0; i < 32; i++)
-    //         LEFT[k][i] = RIGHT[k - 1][i];
-    // }
+        for (int i = 0; i < 32; i++)
+            LEFT[k][i] = RIGHT[k - 1][i];
+    }
  
-    // for (int i = 0; i < 64; i++)
-    // {
-    //     if (i < 32) {
-    //         CIPHER[i] = RIGHT[16][i];
-    //     }
-    //     else {
-    //         CIPHER[i] = LEFT[16][i - 32];
-    //     }
-    //     finalPermutation(i, CIPHER[i]);
-    // }
+    for (int i = 0; i < 64; i++)
+    {
+        if (i < 32) {
+            CIPHER[i] = RIGHT[16][i];
+        }
+        else {
+            CIPHER[i] = LEFT[16][i - 32];
+        }
+        finalPermutation(i, CIPHER[i]);
+    }
 }
- 
- 
-// void convertToBits(int ch[])
-// {
-//     int value = 0;
-//     for (int i = 7; i >= 0; i--) {
-//         value += (int)pow(2, i) * ch[7 - i];
-//     }
-//     fprintf(out, "%c", value);
-// }
- 
-// void bittochar()
-// {
-//     out = fopen("result.txt", "ab+");
-//     for (int i = 0; i < 64; i = i + 8) {
-//         convertToBits(&ENCRYPTED[i]);
-//     }
-//     fclose(out);
-// }
+
  
 void key56to48(int round, int pos, int text)
 {
@@ -505,13 +490,16 @@ int* encrypt(long int n)
   long int plain[n * 64];
   char ch;
 
-  for(int i = 0; i < n; i++)
+  for(int i = 0; i < n*8; i++)
   {
-      ch = MESSAGE[i];
+      ch = MESSAGEINBITS[i];
       plain[i] = ch - 48;
+      // printf("plain: %ld\n", plain[i]);
   }
+  for(int i=n*8; i<n*64; i++)
+    plain[i]=0;
 
-  printf("antes do Encryption\n");
+  // printf("antes do Encryption\n");
   for (int i = 0; i < n; i++) {
       Encryption(plain + 64 * i);
   }
@@ -551,7 +539,12 @@ int main(int argc, char** argv)
   long int n = findFileSize() / 8;
   convertCharToBit(n);
 
-  encrypt(n);
+  int* cipher = encrypt(n);
+
+  printf("cifra: ");
+  for(int i=0; i<64; i++)
+    printf("%d", cipher[i]);
+  printf("\n");
 
   return 0;
 }
