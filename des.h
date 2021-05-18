@@ -528,29 +528,31 @@ long int findFileSize(char* MESSAGE)
   return size;
 }
 
-int encryptDES(char* MESSAGE, char* KEY)
+inline int encryptDES(char* MESSAGE, char* KEY, char* result)
 {
   char* MESSAGEINBITS;
-  int ENCRYPTED[64];
-  int **key48bit;
+  int ENCRYPTED[64], i, **key48bit, *cipher;
+  long int n;
+
   key48bit = (int **)malloc(17 * sizeof(int));
-  for(int i = 0; i < 17; i++) key48bit[i] = (int *)malloc(48 * sizeof(int));
 
-
-  printf("mensagem: %s\nchave: %s\n", MESSAGE, KEY);
+  for(i = 0; i < 17; i++) key48bit[i] = (int *)malloc(48 * sizeof(int));
+  // printf("mensagem: %s\nchave: %s\n", MESSAGE, KEY);
 
 
   create16Keys(key48bit, KEY);
-  long int n = findFileSize(MESSAGE) / 8;
 
-  int i = n * 8;
-  MESSAGEINBITS = (char*) malloc((i+1)*sizeof(char));
+  n = findFileSize(MESSAGE) / 8;
+  MESSAGEINBITS = (char*) malloc((n*8+1)*sizeof(char));
 
   convertCharToBit(n, MESSAGEINBITS, MESSAGE);
-  int* cipher = encrypt(n, key48bit, MESSAGEINBITS, ENCRYPTED);
+  cipher = encrypt(n, key48bit, MESSAGEINBITS, ENCRYPTED);
+  //cipherToResult(cipher, result); <- arrumar os ponteiros
+  
 
   free(MESSAGEINBITS);
-
+  // for(i=0; i<17; i++) free(*(key48bit+i));
+  free(key48bit);
 
   return 0;
 }

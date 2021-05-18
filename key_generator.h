@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-inline void extendWord(char* word, char* ret){
+void extendWord(char* word, char* ret){
 	char* temp;
 	temp = malloc((56*+1)*sizeof(char));
 	for (int i = 0; i < 56 - strlen(word); i++){
@@ -13,7 +13,7 @@ inline void extendWord(char* word, char* ret){
 	free(temp);
 }
 
-inline void generateKey(char* word, char* key){
+void generateKey(char* word, char* key){
 	char byte[9];
 	char* temp;
 	temp = malloc((64+1)*sizeof(char));
@@ -39,7 +39,7 @@ inline void generateKey(char* word, char* key){
 	free(temp);
 }
 
-inline int getKey (char *word, char* key){
+int getKey (char *word, char* key){
 	// char *word = "1111110101010100"; //FD54
 	char *extendedWord;
 	// char* key;

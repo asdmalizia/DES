@@ -1,10 +1,10 @@
-#include "key_generator.c"
+#include "key_generator.h"
 #include <stdio.h>
 #include <stdlib.h>
 // #include <mpi.h>
 #include <sys/time.h>
 #include <math.h>
-// #include "des.c"
+#include "des.h"
 
 unsigned intToBinary(unsigned int k) {
     if (k == 0) return 0;
@@ -59,7 +59,7 @@ int main(int argc, char **argv){
       possibleKey = malloc(65*sizeof(char));
       char *result;
       result = malloc(65*sizeof(char));
-      // getKey(charKey, possibleKey);
+      getKey(charKey, possibleKey);
       // encryptDES(plainText, possibleKey, result);
       
       //Caso em que encontrou a cifra
