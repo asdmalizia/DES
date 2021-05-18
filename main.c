@@ -33,9 +33,6 @@ int main(int argc, char **argv){
 
   keySize = atoi(a);
 	key = (char*)malloc((keySize+1)*sizeof(char));
-
-  printf("%d\n", keySize);
-
 	
 	printf("Buscando a senha que encripta %s em %s\n", plainText, cypherText);
 	// gettimeofday(&start, NULL);
@@ -50,19 +47,19 @@ int main(int argc, char **argv){
 		// myKey = zeroKey + (int)(pow(2, keySize)/size) * myRank;
     
 		while (myKey < (int)(pow(2,keySize)/size) * (myRank+1)){
-      char *charKey;
+      char *charKey, *possibleKey, *result;
       charKey = malloc(65*sizeof(char));
       intToBinaryChar(charKey, myKey);
-      char *possibleKey;
+
       possibleKey = malloc(65*sizeof(char));
-      char *result;
       result = (char *)malloc(65*sizeof(char));
       // printf("%s",typeof(charKey));
       getKey(charKey, possibleKey);
+      printf("possibleKey: %s\n", possibleKey);
       encryptDES(plainText, possibleKey, result);
-      printf("result: %s\n", result);
+      // printf("result: %s\n", result);
       
-      //Caso em que encontrou a cifra
+      // //Caso em que encontrou a cifra
       // if (!strcmp(result, cypherText)){
         // thereIsNextKey = 0;
         // finish = 1;

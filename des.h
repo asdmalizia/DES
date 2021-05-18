@@ -164,7 +164,6 @@ void initialPermutation(int pos, int text, int* IPtext)
     }
   }
   IPtext[i] = text;
-  // printf("text: %d\n", text);
 }
  
 int F1(int i, int X[8][6])
@@ -177,7 +176,7 @@ int F1(int i, int X[8][6])
  
     r = b[0] * 2 + b[5];
     c = 8 * b[1] + 4 * b[2] + 2 * b[3] + b[4];
-    // printf("r: %d, c: %d\n", r, c);
+    printf("r: %d, c: %d\n", r, c);
 
     if (i == 0) {
         return S1[r][c];
@@ -207,6 +206,7 @@ int F1(int i, int X[8][6])
 }
  
 int XOR(int a, int b) {
+  // printf("a = %d, b = %d\n", a, b);
   return (a ^ b);
 }
  
@@ -227,7 +227,7 @@ void ToBits(int value, int* X2)
             X2[3 - j + i] = '0' - 48;
         }
         else {
-            X2[3 - j + i] = '1' - 48;;
+            X2[3 - j + i] = '1' - 48;
         }
     }
  
@@ -238,6 +238,7 @@ void SBox(int XORtext[], int* X2)
 {
     int k = 0;
     int X[8][6];
+    // int iToBits;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 6; j++) {
@@ -249,6 +250,7 @@ void SBox(int XORtext[], int* X2)
     for (int i = 0; i < 8; i++)
     {
         value = F1(i, X);
+
         ToBits(value, X2);
     }
 }
@@ -265,12 +267,10 @@ void PBox(int pos, int text, int* R)
     R[i] = text;
 }
  
-void cipher(int Round, int mode, int** key48bit, int** LEFT, int** RIGHT)
+void cipher(int Round, int mode, int** key48bit, int LEFT[17][48], int RIGHT[17][48])
 {
-    int EXPtext[48];
-    int XORtext[48];
-    int X2[32];
-    int R[32];
+    printf("key48bit[6][34] = %d\n", key48bit[6][34]);
+    int EXPtext[48], XORtext[48], X2[32], R[32];
 
     for (int i = 0; i < 32; i++) {
         expansion_function(i, RIGHT[Round - 1][i], EXPtext);
@@ -280,9 +280,17 @@ void cipher(int Round, int mode, int** key48bit, int** LEFT, int** RIGHT)
     {
         if (mode == 0) {
             XORtext[i] = XOR(EXPtext[i], key48bit[Round][i]);
+            // printf("XORtext[%d] = %d\n", i, XORtext[i]);
+            // printf("EXPtext[%d] = %d\n", i, EXPtext[i]);
+            // printf("key48bit[%d][%d] = %d\n", Round, i ,key48bit[Round][i]);
+            // printf("round = %d\n", Round);
+            // printf("i  = %d\n", i);
         }
         else {
             XORtext[i] = XOR(EXPtext[i], key48bit[17 - Round][i]);
+            // printf("key48bit[][] = %d\n", key48bit[17 - Round][i]);
+            // printf("17- - round = %d", 17-Round);
+            // printf("i  = %d", i);
         }
     }
  
@@ -295,6 +303,8 @@ void cipher(int Round, int mode, int** key48bit, int** LEFT, int** RIGHT)
     for (int i = 0; i < 32; i++) {
         RIGHT[Round][i] = XOR(LEFT[Round - 1][i], R[i]);
     }
+
+    printf("fim da cipher");
 }
  
 void finalPermutation(int pos, int text, int* ENCRYPTED)
@@ -315,48 +325,59 @@ void finalPermutation(int pos, int text, int* ENCRYPTED)
 
 // }
 
-void convertToBinary(int n, char* MESSAGEINBITS)
+int convertToBinary(int n, char* messageInBits, int location)
 {
   int k, m;
-  static int location = 0;
+  // static int location = 0;
+  // printf("antes do for o location: %d\n", location);
   for (int i = 7; i >= 0; i--, location++)
   {
     m = 1 << i;
     k = n & m;
 
     if (k == 0) {
-      MESSAGEINBITS[location] = '0';
+      messageInBits[location] = '0';
     }
     else {
-      MESSAGEINBITS[location] = '1';
+      messageInBits[location] = '1';
     }
+    // printf("messageInBits: %c\n", messageInBits[location]);
   }
+  return location;
+  // printf("messageInBits: %s\n", messageInBits);
 }
  
-int convertCharToBit(long int n, char* MESSAGEINBITS, char* MESSAGE)
+int convertCharToBit(long int n, char* messageInBits, char* MESSAGE)
 {
   char ch;
   int i = n * 8;
+  int location = 0;
 
   for(i = 0; i < n * 8; i++)
   {
     ch = MESSAGE[i]; //CAMINHOS/0
-    convertToBinary(ch, MESSAGEINBITS);
+    // printf("antes do convertToBinary messageInBits: %s\n", messageInBits);
+    location = convertToBinary(ch, messageInBits, location);
   }
-  printf("\nTAMANHO: %ld\n", strlen(MESSAGEINBITS));
-  printf("mensagem em bits: %s\n", MESSAGEINBITS);
+  printf("TAMANHO da messageInBits: %ld\n", strlen(messageInBits));
+  printf("messageInBits: %s\n", messageInBits);
 }
  
 void Encryption(long int plain[], int* IPtext, int** key48bit, int* ENCRYPTED)
 {
+    printf("na encryption antes do mallocs key48bit[6][34] = %d\n", key48bit[6][34]);
     int CIPHER[64];
-    int **LEFT; 
-    LEFT = (int **)malloc(17 * sizeof(int));
-    for(int i = 0; i < 17; i++) LEFT[i] = (int *)malloc(32 * sizeof(int));
+    int LEFT[17][48];
+    int RIGHT[17][48];
+    // int **LEFT; 
+    // LEFT = (int **)malloc(17 * sizeof(int));
+    // for(int i = 0; i < 17; i++) LEFT[i] = (int *)malloc(32 * sizeof(int));
 
-    int** RIGHT;
-    RIGHT = (int **)malloc(17 * sizeof(int));
-    for(int i = 0; i < 17; i++) RIGHT[i] = (int *)malloc(32 * sizeof(int));
+    // int** RIGHT;
+    // RIGHT = (int **)malloc(17 * sizeof(int));
+    // for(int i = 0; i < 17; i++) RIGHT[i] = (int *)malloc(32 * sizeof(int));
+
+    printf("na encryption key48bit[6][34] = %d\n", key48bit[6][34]);
 
     for (int i = 0; i < 64; i++) {
         initialPermutation(i, plain[i], IPtext);
@@ -405,6 +426,7 @@ void key56to48(int round, int pos, int text, int** key48bit)
         }
     }
     key48bit[round][i] = text;
+    printf("key48bit[6][34] = %d\n", key48bit[6][34]);
 }
  
 void key64to56(int pos, int text, int* key56bit)
@@ -489,21 +511,8 @@ void key64to48(unsigned int key[], int** key48bit)
         }
     }
 }
-
-void cipherToResult(int* cipher, char* result){
-  int k;
-  int value=0;
-  for(k=0;k<61;k=k+4){
-    //calcula de quatro em quatro bits o valor correspondente
-    value = pow(2,3)*cipher[k] + pow(2,2)*cipher[k+1] + pow(2,1)*cipher[k+2] + pow(2,0)*cipher[k+3];
-
-    sprintf(&result[k/4],"%X",value);
-    value=0;
-  }
-
-}
  
-int* encrypt(long int n, int** key48bit, char* MESSAGEINBITS, int* ENCRYPTED)
+void encrypt(long int n, int** key48bit, char* messageInBits, int* ENCRYPTED)
 {
   long int plain[n * 64];
   char ch;
@@ -511,13 +520,13 @@ int* encrypt(long int n, int** key48bit, char* MESSAGEINBITS, int* ENCRYPTED)
 
   for(int i = 0; i < n*64; i++)
   {
-      ch = MESSAGEINBITS[i];
+      ch = messageInBits[i];
       plain[i] = ch - 48;
   }
+  printf("na encrypt key48bit[6][34] = %d\n", key48bit[6][34]);
   for (int i = 0; i < n; i++) {
       Encryption(plain + 64 * i, IPtext, key48bit, ENCRYPTED);
   }
-  return ENCRYPTED;
 }
  
 void create16Keys(int** key48bit, char* KEY)
@@ -543,27 +552,36 @@ long int findFileSize(char* MESSAGE)
 
 int encryptDES(char* MESSAGE, char* KEY, char* result)
 {
-  char* MESSAGEINBITS;
-  int ENCRYPTED[64], i, **key48bit, *cipher;
+  int i, **key48bit;
   long int n;
+  char messageInBits[65];
+  int ENCRYPTED[64], cipher[64];
+  
+  messageInBits[64] = '\0';
 
-  key48bit = (int **)malloc(17 * sizeof(int));
-
+  key48bit = (int **)malloc(17 * sizeof(int*));
   for(i = 0; i < 17; i++) key48bit[i] = (int *)malloc(48 * sizeof(int));
-  // printf("mensagem: %s\nchave: %s\n", MESSAGE, KEY);
+  // // printf("mensagem: %s\nchave: %s\n", MESSAGE, KEY);
 
 
   create16Keys(key48bit, KEY);
+  printf("na main key48bit[6][34] = %d\n", key48bit[6][34]);
 
   n = findFileSize(MESSAGE) / 8;
-  MESSAGEINBITS = (char*) malloc((n*8+1)*sizeof(char));
+  // messageInBits = (char *)malloc((n*8 +1) * sizeof(char));
+  // messageInBits = (char *)malloc( ((n*8)+1) * sizeof(char));
+  // messageInBits = (char*) malloc( ((int)n*8 +1) * sizeof(char));
+  // i = n * 8;
+  // char *messageInBits = (char *) malloc((i+1)*sizeof(char));
 
-  convertCharToBit(n, MESSAGEINBITS, MESSAGE);
-  cipher = encrypt(n, key48bit, MESSAGEINBITS, ENCRYPTED);
-  cipherToResult(cipher, result);
+
+  convertCharToBit(n, messageInBits, MESSAGE);
+  encrypt(n, key48bit, messageInBits, ENCRYPTED);
+  // cipher = encrypt(n, key48bit, messageInBits, ENCRYPTED);
+  // cipherToResult(cipher, result);
   
 
-  free(MESSAGEINBITS);
+  // free(messageInBits);
   for(i=0; i<17; i++) free(*(key48bit+i));
   free(key48bit);
 

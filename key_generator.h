@@ -42,7 +42,6 @@ void generateKey(char* word, char* key){
 
 int getKey (char* word, char* key){
 	// char *word = "1111110101010100"; //FD54
-  printf("word: %s\n", word);
 	char *extendedWord;
 	extendedWord = malloc((56+1) * sizeof(char));
 	extendWord(word, extendedWord);
