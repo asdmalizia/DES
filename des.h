@@ -489,6 +489,20 @@ void key64to48(unsigned int key[], int** key48bit)
         }
     }
 }
+
+void cipherToResult(int* cipher, char* result){
+  int k;
+  int value=0;
+  for(k=0;k<61;k=k+4){
+    //calcula de quatro em quatro bits o valor correspondente
+    value = pow(2,3)*cipher[k] + pow(2,2)*cipher[k+1] + pow(2,1)*cipher[k+2] + pow(2,0)*cipher[k+3];
+
+    sprintf(&result[k/4],"%X",value);
+
+    value=0;
+  }
+
+}
  
 int* encrypt(long int n, int** key48bit, char* MESSAGEINBITS, int* ENCRYPTED)
 {
@@ -528,7 +542,7 @@ long int findFileSize(char* MESSAGE)
   return size;
 }
 
-inline int encryptDES(char* MESSAGE, char* KEY, char* result)
+int encryptDES(char* MESSAGE, char* KEY, char* result)
 {
   char* MESSAGEINBITS;
   int ENCRYPTED[64], i, **key48bit, *cipher;
@@ -547,11 +561,11 @@ inline int encryptDES(char* MESSAGE, char* KEY, char* result)
 
   convertCharToBit(n, MESSAGEINBITS, MESSAGE);
   cipher = encrypt(n, key48bit, MESSAGEINBITS, ENCRYPTED);
-  //cipherToResult(cipher, result); <- arrumar os ponteiros
+  cipherToResult(cipher, result);
   
 
   free(MESSAGEINBITS);
-  // for(i=0; i<17; i++) free(*(key48bit+i));
+  for(i=0; i<17; i++) free(*(key48bit+i));
   free(key48bit);
 
   return 0;

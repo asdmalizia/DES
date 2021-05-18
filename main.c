@@ -50,17 +50,17 @@ int main(int argc, char **argv){
 		// myKey = zeroKey + (int)(pow(2, keySize)/size) * myRank;
     
 		while (myKey < (int)(pow(2,keySize)/size) * (myRank+1)){
-			printf("chave: %d\n", myKey);
       char *charKey;
       charKey = malloc(65*sizeof(char));
       intToBinaryChar(charKey, myKey);
-      printf("chave em binário: %s\n", charKey);
       char *possibleKey;
       possibleKey = malloc(65*sizeof(char));
       char *result;
-      result = malloc(65*sizeof(char));
+      result = (char *)malloc(65*sizeof(char));
+      // printf("%s",typeof(charKey));
       getKey(charKey, possibleKey);
-      // encryptDES(plainText, possibleKey, result);
+      encryptDES(plainText, possibleKey, result);
+      printf("result: %s\n", result);
       
       //Caso em que encontrou a cifra
       // if (!strcmp(result, cypherText)){
