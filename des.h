@@ -498,7 +498,6 @@ void cipherToResult(int* cipher, char* result){
     value = pow(2,3)*cipher[k] + pow(2,2)*cipher[k+1] + pow(2,1)*cipher[k+2] + pow(2,0)*cipher[k+3];
 
     sprintf(&result[k/4],"%X",value);
-
     value=0;
   }
 
