@@ -5,7 +5,7 @@
 void extendWord(char* word, char* ret){
 	char* temp;
   int i = 0;
-	temp = (char *)malloc((56*+1)*sizeof(char));
+	temp = (char *)malloc((56+1)*sizeof(char));
 	for (; i < 56 - strlen(word); i++){
 		temp[i] = '0';
 	}
@@ -40,7 +40,7 @@ void generateKey(char* word, char* key){
 	free(temp);
 }
 
-int getKey (char* word, char* key){
+int getKey (char word[65], char key[65]){
 	// char *word = "1111110101010100"; //FD54
 	char *extendedWord;
 	extendedWord = malloc((56+1) * sizeof(char));
