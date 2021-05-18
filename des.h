@@ -347,7 +347,7 @@ int convertCharToBit(long int n, char* messageInBits, char* MESSAGE)
     location = convertToBinary(ch, messageInBits, location);
   }
   // printf("TAMANHO da messageInBits: %ld\n", strlen(messageInBits));
-  printf("messageInBits: %s\n", messageInBits);
+  // printf("messageInBits: %s\n", messageInBits);
 }
  
 void Encryption(long int plain[], int* IPtext, int** key48bit, int* ENCRYPTED)
@@ -386,10 +386,10 @@ void Encryption(long int plain[], int* IPtext, int** key48bit, int* ENCRYPTED)
         }
         finalPermutation(i, CIPHER[i], ENCRYPTED);
     }
-    printf("encripted: ");
-    for(int i=0; i<64; i++)
-      printf("%d", ENCRYPTED[i]);
-    printf("\n");
+    // printf("encripted: ");
+    // for(int i=0; i<64; i++)
+    //   printf("%d", ENCRYPTED[i]);
+    // printf("\n");
 }
 
  
@@ -539,7 +539,6 @@ void cipherToResult(int* cipher, char* result){
 
 }
 
-// int encryptDES(char* MESSAGE, char* KEY, char* result)
 int encryptDES(char* MESSAGE, char* KEY, char* result)
 {
   int i, **key48bit;
@@ -555,23 +554,16 @@ int encryptDES(char* MESSAGE, char* KEY, char* result)
 
 
   create16Keys(key48bit, KEY);
-  // printf("na main key48bit[6][34] = %d\n", key48bit[6][34]);
 
   n = findFileSize(MESSAGE) / 8;
-  // messageInBits = (char *)malloc((n*8 +1) * sizeof(char));
-  // messageInBits = (char *)malloc( ((n*8)+1) * sizeof(char));
-  // messageInBits = (char*) malloc( ((int)n*8 +1) * sizeof(char));
-  // i = n * 8;
-  // char *messageInBits = (char *) malloc((i+1)*sizeof(char));
 
 
   convertCharToBit(n, messageInBits, MESSAGE);
   encrypt(n, key48bit, messageInBits, ENCRYPTED);
   cipherToResult(ENCRYPTED, result);
-  printf("result: %s\n", result);
+  // printf("result: %s\n", result);
   
 
-  // free(messageInBits);
   for(i=0; i<17; i++) free(*(key48bit+i));
   free(key48bit);
 

@@ -6,45 +6,64 @@
 #include <math.h>
 #include "des.h"
 
-unsigned intToBinary(unsigned int k) {
+unsigned long long int intToBinary(unsigned long long int k) {
     if (k == 0) return 0;
     if (k == 1) return 1;
     return (k % 2) + 10 * intToBinary(k / 2);
 }
 
-unsigned intToBinaryChar(char charKey[65], unsigned int k) {
+unsigned int intToBinaryChar(char charKey[65], unsigned long long int k) {
     k = intToBinary(k);
-    sprintf(charKey, "%d", k);
+    // printf("k do int to binary char %ld\n", k);
+    sprintf(charKey, "%lld", k);
     return 0;
 }
 
-// int main(){
-//   char ans[65];
-//   encryptDES("CAMINHOS", "100000001000000010000000100000001000001111101010110010100", ans);
+// char *decimal_to_binary(char p[65], int n)
+// {
+//   int c, d, t;
 
-//   // printf("resposta: %s", ans);
-//   return 0;
+//   t = 0;
+
+//   // if (p == NULL)
+//   //   exit(EXIT_FAILURE);
+
+//   for (c = 31 ; c >= 0 ; c--)
+//   {
+//     d = n >> c;
+
+//     if (d & 1)
+//       *(p+t) = 1 + '0';
+//     else
+//       *(p+t) = 0 + '0';
+
+//     t++;
+//   }
+//   *(p+t) = '\0';
+
+//   return  p;
 // }
 
-int main(int argc, char **argv){
-  char *plainText, *cypherText, *a, *key;
-	int keySize, zeroKey = 0, size = 4, myRank, finish = 0, flag = 0;
-	unsigned int myKey, thereIsNextKey = 1;
-  struct timeval start, end, deltatime;
-  // char *charKey, *possibleKey;
-  char result[65], harKey[65], possibleKey[65];
 
-  //verificar o que essa flag faz.
+int main(int argc, char **argv){
+  char *plainText, *cipherText, *a, *key;
+	int keySize, zeroKey = 0, size = 4, myRank, finish = 0, flag = 0;
+  unsigned long long int myKey;
+  unsigned int thereIsNextKey = 1;
+  struct timeval start, end, deltatime;
+  char result[65], charKey[65], possibleKey[65];
+
+  //verificar o que essa flag faz.long long long long 
   //mudar size para não receber atribuição
 
   plainText = argv[1];
-	cypherText = argv[2];
+	cipherText = argv[2];
 	a = argv[3];
 
   keySize = atoi(a);
 	// key = (char*)malloc((keySize+1)*sizeof(char));
 	
-	printf("Buscando a senha que encripta %s em %s\n", plainText, cypherText);
+	printf("Buscando a senha que encripta %s em %s\n", plainText, cipherText);
 	// gettimeofday(&start, NULL);
 
 	// MPI_Init(&argc, &argv);
@@ -57,16 +76,21 @@ int main(int argc, char **argv){
 		myKey = zeroKey + (int)(pow(2, keySize)/size) * myRank;
     
 		while (myKey < (int)(pow(2,keySize)/size) * (myRank+1)){
-      // charKey = (char *) malloc(65*sizeof(char));
+      
       intToBinaryChar(charKey, myKey);
 
-      // possibleKey = (char*)malloc(65*sizeof(char));
-      // result = (char *)malloc(65*sizeof(char));
-      // printf("%s",typeof(charKey));
+      // printf("mykey = %ld\n", myKey);
+      // printf("charkey = %s\n", charKey);
       getKey(charKey, possibleKey);
-      printf("possibleKey: %s\n", possibleKey);
+      // printf("possibleKey: %s\n", possibleKey);
       encryptDES(plainText, possibleKey, result);
-      // printf("result: %s\n", result);
+      // printf("valor do result na main: %s\n", result);
+      // printf("valor da cifra certa: %s", cipherText);
+
+      if (!strcmp(result, cipherText)){
+        printf("encontrou a chave: %s\n", possibleKey);
+      }
+      
       
       // //Caso em que encontrou a cifra
       // if (!strcmp(result, cypherText)){
