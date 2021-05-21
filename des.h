@@ -149,7 +149,6 @@ void expansion_function(int pos, int text, int* EXPtext)
   {
     if (E[i] == pos + 1) {
         EXPtext[i] = text;
-        // printf("text: %d\n", text);
     }
   }
 }
@@ -176,7 +175,6 @@ int F1(int i, int X[8][6])
  
     r = b[0] * 2 + b[5];
     c = 8 * b[1] + 4 * b[2] + 2 * b[3] + b[4];
-    // printf("r: %d, c: %d\n", r, c);
 
     if (i == 0) {
         return S1[r][c];
@@ -206,7 +204,6 @@ int F1(int i, int X[8][6])
 }
  
 int XOR(int a, int b) {
-  // printf("a = %d, b = %d\n", a, b);
   return (a ^ b);
 }
  
@@ -238,7 +235,6 @@ void SBox(int XORtext[], int* X2)
 {
     int k = 0;
     int X[8][6];
-    // int iToBits;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 6; j++) {
@@ -266,10 +262,9 @@ void PBox(int pos, int text, int* R)
     }
     R[i] = text;
 }
- 
-void cipher(int Round, int mode, int** key48bit, int LEFT[17][48], int RIGHT[17][48])
+
+void cipher(int Round, int mode, int key48bit[17][48], int LEFT[17][48], int RIGHT[17][48])
 {
-    // printf("key48bit[6][34] = %d\n", key48bit[6][34]);
     int EXPtext[48], XORtext[48], X2[32], R[32];
 
     for (int i = 0; i < 32; i++) {
@@ -295,8 +290,6 @@ void cipher(int Round, int mode, int** key48bit, int LEFT[17][48], int RIGHT[17]
     for (int i = 0; i < 32; i++) {
         RIGHT[Round][i] = XOR(LEFT[Round - 1][i], R[i]);
     }
-
-    // printf("fim da cipher\n");
 }
  
 void finalPermutation(int pos, int text, int* ENCRYPTED)
@@ -310,12 +303,6 @@ void finalPermutation(int pos, int text, int* ENCRYPTED)
     }
     ENCRYPTED[i] = text;
 }
- 
-
-// //PRECISA CRIAR UMA FUNÇÃO PARA CONVERTER PARA HEXADECIAMAL
-// void convertToHexa(int n){
-
-// }
 
 int convertToBinary(int n, char* messageInBits, int location)
 {
@@ -346,11 +333,9 @@ int convertCharToBit(long int n, char* messageInBits, char* MESSAGE)
     ch = MESSAGE[i]; //CAMINHOS/0
     location = convertToBinary(ch, messageInBits, location);
   }
-  // printf("TAMANHO da messageInBits: %ld\n", strlen(messageInBits));
-  // printf("messageInBits: %s\n", messageInBits);
 }
  
-void Encryption(long int plain[], int* IPtext, int** key48bit, int* ENCRYPTED)
+void Encryption(long int plain[], int* IPtext, int key48bit[17][48], int* ENCRYPTED)
 {
     int CIPHER[64];
     int LEFT[17][48];
@@ -386,14 +371,9 @@ void Encryption(long int plain[], int* IPtext, int** key48bit, int* ENCRYPTED)
         }
         finalPermutation(i, CIPHER[i], ENCRYPTED);
     }
-    // printf("encripted: ");
-    // for(int i=0; i<64; i++)
-    //   printf("%d", ENCRYPTED[i]);
-    // printf("\n");
 }
 
- 
-void key56to48(int round, int pos, int text, int** key48bit)
+void key56to48(int round, int pos, int text, int key48bit[17][48])
 {
     int i;
     for (i = 0; i < 56; i++)
@@ -403,7 +383,6 @@ void key56to48(int round, int pos, int text, int** key48bit)
         }
     }
     key48bit[round][i] = text;
-    // printf("key48bit[6][34] = %d\n", key48bit[6][34]);
 }
  
 void key64to56(int pos, int text, int* key56bit)
@@ -417,8 +396,8 @@ void key64to56(int pos, int text, int* key56bit)
   }
   key56bit[i] = text;
 }
- 
-void key64to48(unsigned int key[], int** key48bit)
+
+void key64to48(unsigned int key[], int key48bit[17][48])
 {
     int k, backup[17][2];
     int CD[17][56];
@@ -489,7 +468,7 @@ void key64to48(unsigned int key[], int** key48bit)
     }
 }
  
-void encrypt(long int n, int** key48bit, char* messageInBits, int* ENCRYPTED)
+void encrypt(long int n, int key48bit[17][48], char* messageInBits, int* ENCRYPTED)
 {
   long int plain[n * 64];
   char ch;
@@ -505,7 +484,7 @@ void encrypt(long int n, int** key48bit, char* messageInBits, int* ENCRYPTED)
   }
 }
  
-void create16Keys(int** key48bit, char* KEY)
+void create16Keys(int key48bit[17][48], char* KEY)
 {
   unsigned int key[64];
   int ch;
@@ -541,17 +520,13 @@ void cipherToResult(int* cipher, char* result){
 
 int encryptDES(char* MESSAGE, char* KEY, char* result)
 {
-  int i, **key48bit;
+  int i;
   long int n;
   char messageInBits[65];
   int ENCRYPTED[64], cipher[64];
+  int key48bit[17][48];
   
   messageInBits[64] = '\0';
-
-  key48bit = (int **)malloc(17 * sizeof(int*));
-  for(i = 0; i < 17; i++) key48bit[i] = (int *)malloc(48 * sizeof(int));
-  // // printf("mensagem: %s\nchave: %s\n", MESSAGE, KEY);
-
 
   create16Keys(key48bit, KEY);
 
@@ -561,11 +536,6 @@ int encryptDES(char* MESSAGE, char* KEY, char* result)
   convertCharToBit(n, messageInBits, MESSAGE);
   encrypt(n, key48bit, messageInBits, ENCRYPTED);
   cipherToResult(ENCRYPTED, result);
-  // printf("result: %s\n", result);
-  
-
-  for(i=0; i<17; i++) free(*(key48bit+i));
-  free(key48bit);
 
   return 0;
 }

@@ -1,7 +1,6 @@
 #include "key_generator.h"
 #include <stdio.h>
 #include <stdlib.h>
-// #include <mpi.h>
 #include <sys/time.h>
 #include <math.h>
 #include "des.h"
@@ -14,57 +13,39 @@ unsigned long long int intToBinary(unsigned long long int k) {
 
 unsigned int intToBinaryChar(char charKey[65], unsigned long long int k) {
     k = intToBinary(k);
-    // printf("k do int to binary char %ld\n", k);
     sprintf(charKey, "%lld", k);
     return 0;
 }
 
-// char *decimal_to_binary(char p[65], int n)
-// {
-//   int c, d, t;
+void keyToHexa(char* key, char* result){
+  int k;
+  int value=0;
+  for(k=0;k<61;k=k+4){
+    //calcula de quatro em quatro bits o valor correspondente
+    value = pow(2,3)*(key[k]-48) + pow(2,2)*(key[k+1]-48) + pow(2,1)*(key[k+2]-48) + pow(2,0)*(key[k+3]-48);
 
-//   t = 0;
+    sprintf(&result[k/4],"%X",value);
+    value=0;
+  }
+  result[17] = '\0';
 
-//   // if (p == NULL)
-//   //   exit(EXIT_FAILURE);
-
-//   for (c = 31 ; c >= 0 ; c--)
-//   {
-//     d = n >> c;
-
-//     if (d & 1)
-//       *(p+t) = 1 + '0';
-//     else
-//       *(p+t) = 0 + '0';
-
-//     t++;
-//   }
-//   *(p+t) = '\0';
-
-//   return  p;
-// }
-
+}
 
 int main(int argc, char **argv){
-  char *plainText, *cipherText, *a, *key;
-	int keySize, zeroKey = 0, size = 4, myRank, finish = 0, flag = 0;
+  char *plainText, *cipherText, *a;
+	int keySize, zeroKey = 0, size = 1, myRank, finish = 0, flag = 0;
   unsigned long long int myKey;
   unsigned int thereIsNextKey = 1;
   struct timeval start, end, deltatime;
-  char result[65], charKey[65], possibleKey[65];
-
-  //verificar o que essa flag faz.long long long long 
-  //mudar size para não receber atribuição
+  char result[65], charKey[65], possibleKey[65], key[17];
 
   plainText = argv[1];
 	cipherText = argv[2];
 	a = argv[3];
 
   keySize = atoi(a);
-	// key = (char*)malloc((keySize+1)*sizeof(char));
 	
-	printf("Buscando a senha que encripta %s em %s\n", plainText, cipherText);
-	// gettimeofday(&start, NULL);
+	gettimeofday(&start, NULL);
 
 	// MPI_Init(&argc, &argv);
 	// MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -72,23 +53,19 @@ int main(int argc, char **argv){
 
 	// -************************* TIRAR ESSE FOR ********************
 	for (myRank = 0; myRank < size; myRank++) {
-		printf("My Rank: %d\n", myRank);
 		myKey = zeroKey + (int)(pow(2, keySize)/size) * myRank;
+    printf("meu rank: %d\n", myRank);
     
 		while (myKey < (int)(pow(2,keySize)/size) * (myRank+1)){
       
       intToBinaryChar(charKey, myKey);
-
-      // printf("mykey = %ld\n", myKey);
-      // printf("charkey = %s\n", charKey);
       getKey(charKey, possibleKey);
-      // printf("possibleKey: %s\n", possibleKey);
       encryptDES(plainText, possibleKey, result);
-      // printf("valor do result na main: %s\n", result);
-      // printf("valor da cifra certa: %s", cipherText);
 
       if (!strcmp(result, cipherText)){
-        printf("encontrou a chave: %s\n", possibleKey);
+        keyToHexa(possibleKey, key);
+        printf("encontrou a chave: %s\n", key);
+        break;
       }
       
       
@@ -101,26 +78,16 @@ int main(int argc, char **argv){
 
         
       // }
-      // free(charKey);
-      // free(possibleKey);
     
 			myKey++;
 		}
-		// printf("chave: %d\n", ++myKey);
-
-		// do {
-
-		// } while(thereIsNextKey)
 	}
 
-//   gettimeofday(&end, NULL);
-//deltatime = end - start;
-//  printf("senconds: %ld\nmicro seconds : %ld", deltatime.tv_sec, deltatime.tv_usec);
+  gettimeofday(&end, NULL);
 
-
-	// char *key = malloc((64+1)*sizeof(char));
-	// getKey(plainText, key);
-	// printf("plainText: %s\n", plainText);
-	// printf("key: %s\n", key);
+  printf("levou %ld segundos para concluir\n", ((end.tv_sec) -
+    (start.tv_sec)));
+    
+    
   return 0;
 }
